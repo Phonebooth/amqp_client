@@ -216,7 +216,7 @@ tune(#'connection.tune'{channel_max = ServerChannelMax,
                               lists:min([Client, Server])
                       end, [ClientChannelMax, ClientHeartbeat, ClientFrameMax],
                            [ServerChannelMax, ServerHeartbeat, ServerFrameMax]),
-    NewState = State#state{heartbeat = Heartbeat, frame_max = FrameMax},
+    NewState = State#state{heartbeat = lists:max([0,Heartbeat]), frame_max = FrameMax},
     start_heartbeat(SHF, NewState),
     {#'connection.tune_ok'{channel_max = ChannelMax,
                            frame_max   = FrameMax,
