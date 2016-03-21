@@ -70,6 +70,14 @@ handle_message(heartbeat_timeout, State) ->
     {stop, heartbeat_timeout, State};
 handle_message(closing_timeout, State = #state{closing_reason = Reason}) ->
     {stop, Reason, State};
+handle_message({channel_exit,_,{writer,send_failed,Reason}},
+               State = #state{waiting_socket_close = Waiting,
+                              closing_reason       = CloseReason}) ->
+    {stop, case {Reason, Waiting} of
+            {closed, true} -> {shutdown, CloseReason};
+            {closed, false} -> channel_closed_unexpectedly;
+            {_,          _} -> {socket_error, Reason}
+        end, State};
 %% see http://erlang.org/pipermail/erlang-bugs/2012-June/002933.html
 handle_message({Ref, {error, Reason}},
                State = #state{waiting_socket_close = Waiting,
