@@ -26,6 +26,7 @@
 -define(RABBIT_TCP_OPTS, [binary, {packet, 0}, {active,false}, {nodelay, true}]).
 -define(SOCKET_CLOSING_TIMEOUT, 1000).
 -define(HANDSHAKE_RECEIVE_TIMEOUT, 60000).
+-define(GETADDR_TIMEOUT, 20000).
 
 -record(state, {sock,
                 heartbeat,
@@ -165,7 +166,7 @@ inet_address_preference() ->
     end.
 
 gethostaddr(Host) ->
-    Lookups = [{Family, inet:getaddr(Host, Family)}
+    Lookups = [{Family, inet:getaddr(Host, Family, ?GETADDR_TIMEOUT)}
                || Family <- inet_address_preference()],
     [{IP, Family} || {Family, {ok, IP}} <- Lookups].
 
